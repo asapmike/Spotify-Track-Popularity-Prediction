@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <style>
+    html, body { margin: 0; padding: 0; background: white; }
+    #plot { width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+  <div id="plot"></div>
+  <script>
+    const traces = [{"type": "bar", "x": [-0.0544864175430939, -0.05118880958896835, -0.047891201634842784, -0.04459359368071722, -0.04129598572659167, -0.037998377772466105, -0.034700769818340554, -0.03140316186421499, -0.028105553910089433, -0.024807945955963875, -0.021510338001838315, -0.018212730047712757, -0.0149151220935872, -0.011617514139461639, -0.008319906185336078, -0.005022298231210521, -0.0017246902770849636, 0.0015729176770405938, 0.004870525631166151, 0.008168133585291712, 0.01146574153941727, 0.014763349493542827, 0.01806095744766839, 0.02135856540179395, 0.024656173355919506, 0.027953781310045063, 0.03125138926417062, 0.034548997218296185, 0.03784660517242174, 0.0411442131265473, 0.04444182108067286, 0.047739429034798414], "y": [2, 0, 0, 1, 1, 3, 4, 17, 15, 28, 23, 52, 35, 72, 48, 115, 104, 77, 96, 45, 80, 39, 57, 14, 29, 8, 18, 5, 8, 0, 3, 1], "marker": {"color": "#64748B"}, "hovertemplate": "Simulated difference: %{x:.3f}<br>Count: %{y}<extra></extra>"}];
+    const layout = {"title": {"text": "Hypothesis Test Null Distribution", "x": 0.03, "xanchor": "left"}, "paper_bgcolor": "white", "plot_bgcolor": "white", "font": {"family": "Inter, Arial, sans-serif", "size": 13, "color": "#1f2937"}, "margin": {"l": 64, "r": 28, "t": 64, "b": 56}, "xaxis": {"title": "Simulated popular-rate difference"}, "yaxis": {"title": "Count"}, "shapes": [{"type": "line", "x0": 0.16352584709751322, "x1": 0.16352584709751322, "xref": "x", "y0": 0, "y1": 1, "yref": "paper", "line": {"color": "#DC2626", "width": 3}}], "annotations": [{"x": 0.16352584709751322, "y": 1, "xref": "x", "yref": "paper", "text": "observed", "showarrow": false, "xanchor": "left", "yanchor": "top"}], "showlegend": false};
+    Plotly.newPlot("plot", traces, layout, {responsive: true, displaylogo: false});
+  </script>
+</body>
+</html>

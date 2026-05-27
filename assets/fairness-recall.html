@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <style>
+    html, body { margin: 0; padding: 0; background: white; }
+    #plot { width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+  <div id="plot"></div>
+  <script>
+    const traces = [{"type": "bar", "x": ["Older than 1995", "1995 and after"], "y": [0.18, 0.56], "text": ["0.18", "0.56"], "textposition": "outside", "marker": {"color": ["#F97316", "#2563EB"]}, "customdata": [[620.0, 0.04], [630.0, 0.14]], "hovertemplate": "%{x}<br>Recall: %{y:.2f}<br>Tracks: %{customdata[0]}<br>Positive rate: %{customdata[1]:.2f}<extra></extra>"}];
+    const layout = {"title": {"text": "Final Model Recall by Release Era", "x": 0.03, "xanchor": "left"}, "paper_bgcolor": "white", "plot_bgcolor": "white", "font": {"family": "Inter, Arial, sans-serif", "size": 13, "color": "#1f2937"}, "margin": {"l": 64, "r": 28, "t": 64, "b": 56}, "xaxis": {"title": "Release-era group"}, "yaxis": {"title": "Recall", "range": [0, 0.7]}, "showlegend": false};
+    Plotly.newPlot("plot", traces, layout, {responsive: true, displaylogo: false});
+  </script>
+</body>
+</html>

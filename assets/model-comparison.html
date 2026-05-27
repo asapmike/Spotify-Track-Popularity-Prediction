@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <style>
+    html, body { margin: 0; padding: 0; background: white; }
+    #plot { width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+  <div id="plot"></div>
+  <script>
+    const traces = [{"type": "bar", "x": ["accuracy", "balanced_accuracy", "f1", "precision", "recall"], "y": [0.63, 0.66, 0.25, 0.15, 0.71], "name": "Baseline logistic regression", "marker": {"color": "#94A3B8"}, "hovertemplate": "%{x}: %{y:.2f}<extra></extra>"}, {"type": "bar", "x": ["accuracy", "balanced_accuracy", "f1", "precision", "recall"], "y": [0.79, 0.65, 0.29, 0.2, 0.49], "name": "Final random forest", "marker": {"color": "#2563EB"}, "hovertemplate": "%{x}: %{y:.2f}<extra></extra>"}];
+    const layout = {"title": {"text": "Baseline vs. Final Model Performance", "x": 0.03, "xanchor": "left"}, "paper_bgcolor": "white", "plot_bgcolor": "white", "font": {"family": "Inter, Arial, sans-serif", "size": 13, "color": "#1f2937"}, "margin": {"l": 64, "r": 28, "t": 64, "b": 56}, "barmode": "group", "xaxis": {"title": "Metric"}, "yaxis": {"title": "Score", "range": [0, 1]}, "legend": {"orientation": "h", "y": -0.24}};
+    Plotly.newPlot("plot", traces, layout, {responsive: true, displaylogo: false});
+  </script>
+</body>
+</html>

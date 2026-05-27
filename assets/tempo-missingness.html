@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <style>
+    html, body { margin: 0; padding: 0; background: white; }
+    #plot { width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+  <div id="plot"></div>
+  <script>
+    const traces = [{"type": "bar", "x": ["classical", "jazz", "country", "hip-hop", "edm"], "y": [34.9, 31.2, 21.8, 17.6, 14.1], "text": ["34.9%", "31.2%", "21.8%", "17.6%", "14.1%"], "textposition": "outside", "marker": {"color": ["#5B8DEF", "#8B5CF6", "#F59E0B", "#EF4444", "#10B981"]}, "hovertemplate": "%{x}<br>Tempo missing: %{y:.1f}%<extra></extra>"}];
+    const layout = {"title": {"text": "Tempo Missingness by Genre", "x": 0.03, "xanchor": "left"}, "paper_bgcolor": "white", "plot_bgcolor": "white", "font": {"family": "Inter, Arial, sans-serif", "size": 13, "color": "#1f2937"}, "margin": {"l": 64, "r": 28, "t": 64, "b": 56}, "xaxis": {"title": "Genre"}, "yaxis": {"title": "Tempo missing (%)", "range": [0, 40]}, "showlegend": false};
+    Plotly.newPlot("plot", traces, layout, {responsive: true, displaylogo: false});
+  </script>
+</body>
+</html>

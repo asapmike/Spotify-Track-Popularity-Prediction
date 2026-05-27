@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <style>
+    html, body { margin: 0; padding: 0; background: white; }
+    #plot { width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+  <div id="plot"></div>
+  <script>
+    const traces = [{"type": "bar", "x": ["Lowest", "Low", "Middle", "High", "Highest"], "y": [4.84, 5.54, 6.21, 7.13, 21.19], "text": ["4.8%", "5.5%", "6.2%", "7.1%", "21.2%"], "textposition": "outside", "marker": {"color": "#2563EB"}, "customdata": [[992.0, 29.92], [993.0, 20.64], [1031.0, 15.31], [1066.0, 18.51], [873.0, 33.74]], "hovertemplate": "Group: %{x}<br>Popular share: %{y:.1f}%<br>Tracks: %{customdata[0]}<br>Mean popularity: %{customdata[1]:.1f}<extra></extra>"}];
+    const layout = {"title": {"text": "Share of Highly Popular Tracks by Artist Follower Group", "x": 0.03, "xanchor": "left"}, "paper_bgcolor": "white", "plot_bgcolor": "white", "font": {"family": "Inter, Arial, sans-serif", "size": 13, "color": "#1f2937"}, "margin": {"l": 64, "r": 28, "t": 64, "b": 56}, "xaxis": {"title": "Artist follower quintile"}, "yaxis": {"title": "Tracks with popularity >= 70 (%)", "range": [0, 25]}, "showlegend": false};
+    Plotly.newPlot("plot", traces, layout, {responsive: true, displaylogo: false});
+  </script>
+</body>
+</html>
