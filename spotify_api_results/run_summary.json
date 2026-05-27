@@ -1,0 +1,22 @@
+{
+  "fetched_at_utc": "2026-05-25T21:28:50.121887+00:00",
+  "tracks_csv": "/Users/mikeli/Desktop/dsc80-2026-sp/projects/proj04/Spotify Music Tracks/Data/music_tracks.csv",
+  "genres": [
+    "classical",
+    "hip-hop",
+    "country",
+    "edm",
+    "jazz"
+  ],
+  "per_genre": 2,
+  "expected_rows": 10,
+  "output_rows": 10,
+  "unique_track_ids_requested": 10,
+  "unique_track_ids_fetched": 10,
+  "failed_unique_track_ids": 0,
+  "market": "US",
+  "output_csv": "/Users/mikeli/Desktop/dsc80-2026-sp/projects/proj04/spotify_api_results/spotify_tracks_current_popularity.csv",
+  "failures_csv": "/Users/mikeli/Desktop/dsc80-2026-sp/projects/proj04/spotify_api_results/spotify_api_failures.csv",
+  "play_count_available_from_official_api": false,
+  "warning": "Official Spotify Web API exposes track popularity but not raw play counts. The play_count column is intentionally blank."
+}

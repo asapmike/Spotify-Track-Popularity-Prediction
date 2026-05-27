@@ -1,0 +1,6 @@
+track_id,request_index,error
+7wrYBASu0OoxoDErd4Edxd,1,HTTP 429 for https://api.spotify.com/v1/tracks/7wrYBASu0OoxoDErd4Edxd?market=US: Too many requests
+2wrJq5XKLnmhRXHIAf9xBa,2,HTTP 429 for https://api.spotify.com/v1/tracks/2wrJq5XKLnmhRXHIAf9xBa?market=US: Too many requests
+7BKLCZ1jbUBVqRi2FVlTVw,3,HTTP 429 for https://api.spotify.com/v1/tracks/7BKLCZ1jbUBVqRi2FVlTVw?market=US: Too many requests
+1aL9518P5G72N92b48tuKw,4,HTTP 429 for https://api.spotify.com/v1/tracks/1aL9518P5G72N92b48tuKw?market=US: Too many requests
+1ko2lVN0vKGUl9zrU0qSlT,5,HTTP 429 for https://api.spotify.com/v1/tracks/1ko2lVN0vKGUl9zrU0qSlT?market=US: Too many requests
