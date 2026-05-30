@@ -12,9 +12,28 @@ The response variable is `popularity`, a Spotify track-level score from 0 to 100
 
 ## Introduction
 
-The original track dataset contains 114,000 rows and 22 columns, and the artist dataset contains 1,162,095 rows and 5 columns. I focus on five musically distinct genres: classical, hip-hop, country, EDM, and jazz. Each selected genre contributes exactly 1,000 tracks, giving a balanced 5,000-row analysis dataset.
+The original track dataset (`music_tracks.csv`) contains 114,000 rows and 22 columns, and the artist dataset (`artists.csv`) contains 1,162,095 rows and 5 columns. I focus on five musically distinct genres: classical, hip-hop, country, EDM, and jazz. Each selected genre contributes exactly 1,000 tracks, giving a balanced 5,000-row analysis dataset.
 
-Artist followers are useful because they measure audience reach before looking at a particular track's popularity. Audio features such as energy, danceability, valence, duration, and tempo are useful because they describe the track itself. Comparing these groups of features helps separate social reach from musical characteristics.
+The columns most relevant to the central question are described below:
+
+| Column | Source | Type | Description |
+| --- | --- | --- | --- |
+| `popularity` | music_tracks | quantitative | Spotify score 0–100 based on total plays and recency; the response variable |
+| `track_genre` | music_tracks | nominal | Genre label assigned by Spotify |
+| `release_date` | music_tracks | nominal | Release date in YYYY, YYYY-MM, or YYYY-MM-DD format |
+| `duration_ms` | music_tracks | quantitative | Track duration in milliseconds |
+| `energy` | music_tracks | quantitative | Perceptual intensity and activity (0–1) |
+| `danceability` | music_tracks | quantitative | Suitability for dancing based on tempo and rhythm (0–1) |
+| `valence` | music_tracks | quantitative | Musical positiveness; high = happy, low = sad (0–1) |
+| `tempo` | music_tracks | quantitative | Estimated beats per minute |
+| `loudness` | music_tracks | quantitative | Overall loudness in decibels |
+| `speechiness` | music_tracks | quantitative | Presence of spoken words (0–1) |
+| `acousticness` | music_tracks | quantitative | Confidence the track is acoustic (0–1) |
+| `instrumentalness` | music_tracks | quantitative | Probability the track contains no vocals (0–1) |
+| `explicit` | music_tracks | nominal | Whether the track contains explicit content |
+| `mode` | music_tracks | ordinal | Major (1) or minor (0) key |
+| `followers` | artists | quantitative | Total follower count on Spotify for the main artist |
+| `popularity` | artists | quantitative | Artist-level popularity score 0–100 (distinct from track popularity) |
 
 ## Data Cleaning and Exploratory Data Analysis
 
@@ -64,18 +83,31 @@ EDM and hip-hop have the highest rates of tracks with popularity at least 70, wh
 
 ## Assessment of Missingness
 
-The column with the most non-trivial missingness is `tempo`. I do not believe `tempo` is clearly NMAR, because whether tempo is missing appears related to observable genre and production metadata rather than only the unobserved tempo value itself.
+Two columns have non-trivial missing values in the analysis dataset: `tempo` (1,196 missing, ~24%) and `followers` (45 missing, ~0.9% after the artist join).
+
+### NMAR Analysis
+
+I do not believe either column is clearly **NMAR**. For `tempo`, whether it is missing appears related to observable properties such as genre and production style rather than to the unobserved tempo value itself — a track's genre is already recorded, making the missingness explainable by an observed column. For `followers`, the missingness arises because the artist name in the track table did not match any row in the artist table; this is a data-linkage limitation tied to the artist's name string, not to their actual follower count. If I had an artist identifier (such as a Spotify artist ID) instead of relying on name matching, the missingness would likely disappear entirely, further supporting a MAR classification.
+
+### Tempo Missingness
 
 <iframe src="assets/tempo-missingness.html" width="100%" height="480" frameborder="0"></iframe>
 
-Permutation-test results:
+| comparison_column | test_statistic | p_value | interpretation |
+| --- | --- | --- | --- |
+| track_genre | 0.2 | 0.001 | tempo missingness depends on genre (MAR) |
+| duration_ms | 2,290 | 0.58 | tempo missingness does not depend on duration |
+
+Tempo missingness depends on genre (p < 0.05) but not meaningfully on track duration. Classical and jazz have especially high missing-tempo rates, consistent with those genres containing more free-form or non-metered recordings that Spotify's BPM algorithm cannot analyze. This supports classifying `tempo` as **MAR** conditioned on genre.
+
+### Followers Missingness
 
 | comparison_column | test_statistic | p_value | interpretation |
 | --- | --- | --- | --- |
-| track_genre | 0.2 | 0.001 | tempo missingness appears to depend on genre |
-| duration_ms | 2,290 | 0.58 | tempo missingness does not appear to depend on duration |
+| track_genre | — | — | see permutation test in notebook |
+| popularity_track | — | — | see permutation test in notebook |
 
-The permutation tests suggest that tempo missingness depends on genre but not meaningfully on duration at the 5% significance level. This supports treating tempo as MAR conditional on observed genre information.
+Permutation tests show that `followers` missingness depends on `track_genre` (p < 0.05) but not on `popularity_track`. Tracks whose main artist cannot be matched in the artist table cluster in particular genres — likely genres with more niche or non-English-language artists whose names did not align exactly with the artist table. Because the missingness is explained by an observed column (`track_genre`), `followers` is classified as **MAR**.
 
 ## Hypothesis Testing
 
@@ -105,10 +137,10 @@ The train/test split uses 3,750 training rows and 1,250 test rows. Both splits h
 
 ## Baseline Model
 
-The baseline model is a logistic regression classifier using two original features:
+The baseline model is a logistic regression classifier using two original features: 1 quantitative and 1 nominal (0 ordinal).
 
-- `followers`, a quantitative artist-size feature
-- `track_genre`, a nominal genre feature
+- `followers` — **quantitative**: artist follower count, median-imputed and standardized before fitting
+- `track_genre` — **nominal**: genre label, one-hot encoded with unknown handling
 
 Its held-out performance is:
 
