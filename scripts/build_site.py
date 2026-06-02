@@ -19,6 +19,13 @@ COLORS = {
     "hip-hop": "#EF4444",
     "jazz": "#8B5CF6",
 }
+PLOTLY_DEFAULT_COLORS = {
+    "classical": "#1f77b4",
+    "country": "#ff7f0e",
+    "edm": "#2ca02c",
+    "hip-hop": "#d62728",
+    "jazz": "#9467bd",
+}
 
 
 def clean_data() -> pd.DataFrame:
@@ -135,27 +142,78 @@ def iframe(path: str, height: int = 520) -> str:
 
 def build_plots(merged: pd.DataFrame) -> dict[str, str]:
     traces = []
-    for genre in SELECTED_GENRES:
+    genre_order = merged["track_genre"].drop_duplicates().tolist()
+    for genre in genre_order:
         subset = merged.loc[merged["track_genre"].eq(genre), "popularity_track"].dropna()
+        color = PLOTLY_DEFAULT_COLORS[genre]
+        traces.append(
+            {
+                "type": "box",
+                "x": subset.tolist(),
+                "y": [genre] * len(subset),
+                "name": genre,
+                "legendgroup": genre,
+                "showlegend": False,
+                "orientation": "h",
+                "marker": {"color": color},
+                "line": {"color": color},
+                "fillcolor": color,
+                "opacity": 0.55,
+                "xaxis": "x2",
+                "yaxis": "y2",
+                "hovertemplate": f"{genre}<br>Track Popularity: %{{x}}<extra></extra>",
+            }
+        )
         traces.append(
             {
                 "type": "histogram",
                 "x": subset.tolist(),
                 "name": genre,
-                "opacity": 0.62,
+                "legendgroup": genre,
+                "opacity": 0.55,
                 "xbins": {"start": 0, "end": 100, "size": 5},
-                "marker": {"color": COLORS[genre]},
-                "hovertemplate": f"{genre}<br>Popularity bin: %{{x}}<br>Tracks: %{{y}}<extra></extra>",
+                "marker": {"color": color},
+                "xaxis": "x",
+                "yaxis": "y",
+                "hovertemplate": f"{genre}<br>Track Popularity: %{{x}}<br>count: %{{y}}<extra></extra>",
             }
         )
     plot_html(
-        "Track Popularity Distribution by Genre",
+        "Distribution of Track Popularity Across Selected Genres",
         traces,
         {
+            "title": {
+                "text": "Distribution of Track Popularity Across Selected Genres",
+                "x": 0.5,
+                "xanchor": "center",
+            },
             "barmode": "overlay",
-            "xaxis": {"title": "Track popularity", "range": [0, 100]},
-            "yaxis": {"title": "Number of tracks"},
-            "legend": {"orientation": "h", "y": -0.22},
+            "xaxis": {
+                "title": "Track Popularity",
+                "range": [0, 100],
+                "domain": [0, 0.82],
+                "anchor": "y",
+            },
+            "yaxis": {
+                "title": "count",
+                "domain": [0, 0.74],
+                "anchor": "x",
+            },
+            "xaxis2": {
+                "range": [0, 100],
+                "domain": [0, 0.82],
+                "anchor": "y2",
+                "matches": "x",
+                "showticklabels": False,
+            },
+            "yaxis2": {
+                "domain": [0.76, 1],
+                "anchor": "x2",
+                "showticklabels": False,
+                "categoryorder": "array",
+                "categoryarray": genre_order,
+            },
+            "legend": {"title": {"text": "Genre"}, "x": 0.84, "y": 0.98},
         },
         "popularity-distribution.html",
     )
