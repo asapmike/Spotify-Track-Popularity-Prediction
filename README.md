@@ -12,7 +12,7 @@ The response variable is `popularity`, a Spotify track-level score from 0 to 100
 
 ## Introduction
 
-The original track dataset (`music_tracks.csv`) contains 114,000 rows and 22 columns, and the artist dataset (`artists.csv`) contains 1,162,095 rows and 5 columns. I focus on five musically distinct genres: classical, hip-hop, country, EDM, and jazz. Each selected genre contributes exactly 1,000 tracks, giving a balanced 5,000-row analysis dataset.
+The original track dataset (`music_tracks.csv`) contains 114,000 rows and 22 columns, and the artist dataset (`artists.csv`) contains 1,162,095 rows and 5 columns. I focus on five musically distinct genres: classical, hip-hop, country, EDM, and jazz. Each selected genre contributes exactly 1,000 tracks, giving a balanced 5,000-row analysis dataset. I chose these labels rather than combining related categories because they represent distinct listening contexts in Spotify's taxonomy; for example, EDM is kept separate from broader electronic/dance labels, and hip-hop is kept separate from neighboring pop or rap-adjacent categories in the full dataset.
 
 The columns most relevant to the central question are described below:
 
@@ -37,7 +37,7 @@ The columns most relevant to the central question are described below:
 
 ## Data Cleaning and Exploratory Data Analysis
 
-I filtered to the five selected genres, extracted `release_year` from `release_date`, created decade and binary popularity flags, and split the semicolon-separated `artists` field to identify each track's main artist. Artist names were not unique in the artist table, so I kept the row with the highest follower count for each artist name before joining. I also log-transformed followers with `log1p` because the follower distribution is extremely right-skewed.
+I filtered to the five selected genres, extracted `release_year` from `release_date`, created decade and binary popularity flags, and split the semicolon-separated `artists` field to identify each track's main artist. Artist names were not unique in the artist table, so I kept the row with the highest follower count for each artist name before joining. I also log-transformed followers with `log1p` because the follower distribution is extremely right-skewed. For modeling only, I remove duplicate `track_id` rows before splitting so the same track cannot appear in both the training and test sets.
 
 Important data quality checks:
 
@@ -102,12 +102,14 @@ Tempo missingness depends on genre (p < 0.05) but not meaningfully on track dura
 
 ### Followers Missingness
 
+The artist-side columns `id`, `followers`, `genres`, `name`, `popularity_artist`, and `log_followers` are missing for the same 45 rows, all caused by the track's `main_artist` name failing to match a row in `artists.csv`. I therefore analyze `followers` as the representative missing column for this shared artist-join missingness mechanism.
+
 | comparison_column | test_statistic | p_value | interpretation |
 | --- | --- | --- | --- |
-| track_genre | — | — | see permutation test in notebook |
-| popularity_track | — | — | see permutation test in notebook |
+| track_genre | 0.25 | 0.008 | followers missingness depends on genre |
+| popularity_track | 7.03 | 0.106 | followers missingness does not depend on track popularity |
 
-Permutation tests show that `followers` missingness depends on `track_genre` (p < 0.05) but not on `popularity_track`. Tracks whose main artist cannot be matched in the artist table cluster in particular genres — likely genres with more niche or non-English-language artists whose names did not align exactly with the artist table. Because the missingness is explained by an observed column (`track_genre`), `followers` is classified as **MAR**.
+Permutation tests show that `followers` missingness depends on `track_genre` but not meaningfully on `popularity_track`. Tracks whose main artist cannot be matched in the artist table cluster in particular genres — likely genres with more niche or non-English-language artists whose names did not align exactly with the artist table. Because the missingness is explained by an observed column (`track_genre`), `followers` is classified as **MAR**. A direct Spotify artist ID in the track table would be useful additional data because it would make the join deterministic and would likely explain or eliminate this missingness more cleanly than name matching.
 
 ## Hypothesis Testing
 
@@ -133,7 +135,7 @@ The p-value is below 0.05, so I reject the null hypothesis. The data provide evi
 
 I frame the prediction task as binary classification: predict whether `popular_70` is true. This is a classification problem because the response is a yes/no label. I evaluate models primarily with F1-score because the positive class is uncommon: only about 9% of the train and test rows are highly popular. Accuracy alone would overstate model quality.
 
-The train/test split uses 3,750 training rows and 1,250 test rows. Both splits have a positive rate of about 0.09.
+At prediction time, I assume the track's metadata, genre, audio features, release date, and artist follower count are known, but its Spotify popularity score is not. I therefore exclude `popularity_track`, `popular_70`, `popularity_zero`, and artist-level `popularity_artist` from the feature set. After dropping duplicate `track_id` rows for modeling, the train/test split uses 3,675 training rows and 1,225 test rows. The training and test positive rates are both about 0.09, and no `track_id` appears in both splits.
 
 ## Baseline Model
 
@@ -144,49 +146,54 @@ The baseline model is a logistic regression classifier using two original featur
 
 Its held-out performance is:
 
-- Accuracy: 0.63
-- Balanced accuracy: 0.66
-- F1-score: 0.25
-- Precision: 0.15
-- Recall: 0.71
+- Accuracy: 0.60
+- Balanced accuracy: 0.70
+- F1-score: 0.27
+- Precision: 0.16
+- Recall: 0.83
 
 The baseline finds many popular tracks, but precision is low, so many predicted-positive tracks are false positives.
 
 ## Final Model
 
-The final model is a random forest classifier with engineered features, including `duration_min`, `release_age`, `log_followers`, audio-feature interactions, and genre-level popularity rates. Hyperparameters were selected with cross-validation.
+The final model is a random forest classifier with engineered features, including `duration_min`, `release_age`, `log_followers`, `energy_x_danceability`, and `acoustic_instrumental`. These features are appropriate because popularity can depend on recency, track length, artist scale on a log scale, and interactions between audio characteristics such as energy and danceability. Hyperparameters were selected with cross-validation.
 
 Best hyperparameters:
 
 - `n_estimators`: 200
-- `max_depth`: None
-- `min_samples_leaf`: 20
-- Best cross-validated F1-score: 0.35
+- `max_depth`: 8
+- `min_samples_leaf`: 5
+- Best cross-validated F1-score: 0.32
 
 | metric | baseline_logistic_regression | final_random_forest |
 | --- | --- | --- |
-| accuracy | 0.63 | 0.79 |
-| balanced_accuracy | 0.66 | 0.65 |
-| f1 | 0.25 | 0.29 |
-| precision | 0.15 | 0.2 |
-| recall | 0.71 | 0.49 |
+| accuracy | 0.60 | 0.79 |
+| balanced_accuracy | 0.70 | 0.68 |
+| f1 | 0.27 | 0.31 |
+| precision | 0.16 | 0.22 |
+| recall | 0.83 | 0.55 |
 
 <iframe src="assets/model-comparison.html" width="100%" height="480" frameborder="0"></iframe>
 
-The final random forest improves F1-score from 0.25 to 0.29 and improves precision from 0.15 to 0.20. It gives up some recall, but its positive predictions are more reliable than the baseline's.
+The final random forest improves F1-score from 0.27 to 0.31 and improves precision from 0.16 to 0.22. It gives up recall and has slightly lower balanced accuracy, but F1 is the chosen metric because the task is to find a better balance between precision and recall for the rare highly popular class.
 
 ## Fairness Analysis
 
 I evaluated whether the final model performs worse for older tracks than for newer tracks. Group X is tracks released before the median release year in the test set, and Group Y is tracks released in or after the median year. I use recall parity because false negatives are costly in this framing: a model that misses popular tracks for one release era is less useful for that group.
 
-| group | n_tracks | positive_rate | recall |
-| --- | --- | --- | --- |
-| older_than_1995 | 620 | 0.04 | 0.18 |
-| newer_or_1995_and_after | 630 | 0.14 | 0.56 |
+- **Null hypothesis:** the final model is fair with respect to release era; its recall for older and newer tracks is roughly the same, and any observed difference is due to random chance.
+- **Alternative hypothesis:** the final model is unfair with respect to release era; recall is lower for older tracks than for newer tracks.
+- **Test statistic:** newer-track recall minus older-track recall.
+- **Significance level:** 0.05.
+
+| group | n_tracks | n_actual_popular | positive_rate | recall |
+| --- | --- | --- | --- | --- |
+| older_than_1994 | 601 | 26 | 0.04 | 0.08 |
+| newer_or_1994_and_after | 624 | 83 | 0.13 | 0.70 |
 
 <iframe src="assets/fairness-recall.html" width="100%" height="480" frameborder="0"></iframe>
 
-The observed recall gap is 0.381 in favor of newer tracks, with a permutation-test p-value of 0.001. I reject the null hypothesis of equal recall. The model appears to have lower recall for older tracks in this test set. This does not prove intentional bias, but it suggests that release-era effects should be monitored if the model is used for decision-making.
+The observed recall gap is 0.622 in favor of newer tracks, with a permutation-test p-value of 0.001. I reject the null hypothesis of equal recall. The model appears to have lower recall for older tracks in this test set. This does not prove intentional bias, but it suggests that release-era effects should be monitored if the model is used for decision-making. One limitation is that the older-track group contains only 26 truly popular tracks, so its recall estimate is noisier than the newer-track estimate.
 
 ## Conclusion
 

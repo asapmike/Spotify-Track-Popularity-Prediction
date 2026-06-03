@@ -10,3 +10,16 @@ env/
 
 .env
 .env.*
+
+# Keep the public GitHub Pages repository limited to the website deliverable.
+*.ipynb
+*.csv
+*.json
+*.jsonl
+*.png
+*.wav
+*.py
+*DSC 80.html
+Spotify Music Tracks/
+spotify_api_results/
+scripts/

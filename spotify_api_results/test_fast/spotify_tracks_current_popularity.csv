@@ -1,6 +1,0 @@
-track_genre,dataset_track_id,dataset_track_name,dataset_artists,dataset_album_name,dataset_popularity,api_track_id,api_track_name,api_artist_names,api_artist_ids,api_album_id,api_album_name,api_release_date,api_popularity,popularity_changed,api_duration_ms,api_explicit,api_is_playable,api_spotify_url,api_isrc,play_count,play_count_note
-classical,7wrYBASu0OoxoDErd4Edxd,Zara Zara,Bombay Jayashri,Rehnaa Hai Terre Dil Mein,58,,,,,,,,,,,,,,,,Not available from the official Spotify Web API
-country,2wrJq5XKLnmhRXHIAf9xBa,"10,000 Hours (with Justin Bieber)",Dan + Shay;Justin Bieber,"10,000 Hours (with Justin Bieber)",78,,,,,,,,,,,,,,,,Not available from the official Spotify Web API
-edm,7BKLCZ1jbUBVqRi2FVlTVw,Closer,The Chainsmokers;Halsey,Closer,84,,,,,,,,,,,,,,,,Not available from the official Spotify Web API
-hip-hop,1aL9518P5G72N92b48tuKw,Summer High,AP Dhillon,Summer High,83,,,,,,,,,,,,,,,,Not available from the official Spotify Web API
-jazz,1ko2lVN0vKGUl9zrU0qSlT,Just the Two of Us (feat. Bill Withers),"Grover Washington, Jr.;Bill Withers",Anthology,77,,,,,,,,,,,,,,,,Not available from the official Spotify Web API
